@@ -1,0 +1,65 @@
+# Systemd service unit files
+# Copy these three files to /etc/systemd/system/ then run:
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now datacollect-poller
+#   sudo systemctl enable --now datacollect-sender
+#   sudo systemctl enable --now datacollect-dashboard
+#
+# Replace /path/to/project and yourusername with real values.
+# -----------------------------------------------------------------------
+
+# ---- FILE: /etc/systemd/system/datacollect-poller.service ----
+[Unit]
+Description=Data Collection — POP3 Poller
+After=network.target
+
+[Service]
+Type=simple
+User=yourusername
+WorkingDirectory=/path/to/project
+ExecStart=/path/to/project/venv/bin/python poller.py
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+
+
+# ---- FILE: /etc/systemd/system/datacollect-sender.service ----
+[Unit]
+Description=Data Collection — SMTP Sender
+After=network.target
+
+[Service]
+Type=simple
+User=yourusername
+WorkingDirectory=/path/to/project
+ExecStart=/path/to/project/venv/bin/python sender.py
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+
+
+# ---- FILE: /etc/systemd/system/datacollect-dashboard.service ----
+[Unit]
+Description=Data Collection — Flask Admin Dashboard
+After=network.target
+
+[Service]
+Type=simple
+User=yourusername
+WorkingDirectory=/path/to/project
+ExecStart=/path/to/project/venv/bin/python app.py
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

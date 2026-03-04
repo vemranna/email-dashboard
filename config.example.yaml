@@ -1,0 +1,134 @@
+# =============================================================================
+# config.yaml — Central configuration for the data-collection automation system
+# Edit all values marked with <EDIT> before running anything.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Email account credentials and server settings
+# -----------------------------------------------------------------------------
+email:
+  address: "you@yourcompany.com"          # <EDIT> Your email address
+  username: "you@yourcompany.com"          # <EDIT> Login username (often same as address)
+  password: "yourpassword"                 # <EDIT> Your email password
+
+  pop3:
+    host: "mail.yourcompany.com"           # <EDIT> POP3 server hostname
+    port: 995                              # 995 = POP3S (TLS); 110 = plain POP3
+    use_tls: true                          # Set false if using port 110 without STARTTLS
+
+  smtp:
+    host: "mail.yourcompany.com"           # <EDIT> SMTP server hostname
+    port: 587                              # 587 = STARTTLS; 465 = SMTPS; 25 = plain
+    use_tls: true                          # Uses STARTTLS; set false for port 465 (implicit TLS)
+    use_ssl: false                         # Set true only for implicit TLS (port 465)
+
+# -----------------------------------------------------------------------------
+# File and directory paths (relative to the project root, or absolute)
+# -----------------------------------------------------------------------------
+paths:
+  recipients_file: "recipients.txt"        # One email address per line
+  template_file: "template.xlsx"           # The Excel template to attach to initial emails
+  validator_script: "./validator.py"        # Path to your validator; called as: python validator.py <file>
+  data_dir: "data"                          # Root directory for all stored data
+  db_file: "data/db.sqlite"                 # SQLite database file
+  inbox_dir: "data/inbox"                   # Raw .eml files saved here
+  attachments_dir: "data/attachments"       # Validated files stored here, per sender
+  queue_dir: "data/queue"                   # Staging area for outgoing attachment files
+  users_file: "users.txt"                   # HTTP basic-auth users, one "username:password" per line
+
+# -----------------------------------------------------------------------------
+# Polling settings
+# -----------------------------------------------------------------------------
+polling:
+  interval_seconds: 120                    # How often to check inbox (in seconds)
+  # POP3 notes: POP3 does not support "only new messages" natively. We track
+  # which Message-IDs we have already processed in the database to avoid
+  # re-processing messages that remain on the server.
+  delete_after_download: false             # If true, deletes messages from server after download.
+                                           # Recommended: false, so Thunderbird still gets them.
+
+# -----------------------------------------------------------------------------
+# Sending settings
+# -----------------------------------------------------------------------------
+sending:
+  autosend: false                          # If true, queued emails are sent without manual approval.
+                                           # Toggle this from the dashboard once you trust the system.
+  interval_seconds: 60                     # How often the sender daemon checks the queue
+
+# -----------------------------------------------------------------------------
+# Activity identification
+# -----------------------------------------------------------------------------
+# The system identifies incoming emails as "related to this activity" by checking
+# whether the sender is in recipients.txt AND whether the email has an .xlsx attachment.
+# Optionally, you can also match on subject keyword to reduce false positives.
+activity:
+  subject_keyword: ""                      # If non-empty, incoming subject must contain this string.
+                                           # Leave empty to match any email with .xlsx from a recipient.
+
+# -----------------------------------------------------------------------------
+# Email templates
+# Edit the subject and body for each email type.
+# Available placeholders:
+#   {recipient}   — the recipient's email address
+#   {sender}      — the sender's email address (for response emails)
+#   {summary}     — validator stdout output (success emails)
+#   {errors}      — validator stderr output (failure emails)
+#   {filename}    — the stored filename (success emails)
+#   {timestamp}   — ISO timestamp of when the file was received
+# -----------------------------------------------------------------------------
+templates:
+
+  initial_email:
+    subject: "Data Collection Request — Please Submit Your Data"    # <EDIT>
+    body: |                                                          # <EDIT>
+      Dear Colleague,
+
+      We are collecting data for our organisation's records. Please fill in
+      the attached Excel template and reply to this email with the completed
+      file as an attachment.
+
+      If you have any questions, please reply to this email.
+
+      Thank you,
+      Admin Team
+
+  validation_success:
+    subject: "Data Received and Validated Successfully"
+    body: |
+      Dear {sender},
+
+      Thank you for submitting your data. Your file has been received and
+      passed validation successfully.
+
+      Validation summary:
+      --------------------------------------------------
+      {summary}
+      --------------------------------------------------
+
+      Stored as: {filename}
+      Received at: {timestamp}
+
+      No further action is needed from you.
+
+      Regards,
+      Admin Team
+
+  validation_failure:
+    subject: "Data Submission — Validation Errors Found"
+    body: |
+      Dear {sender},
+
+      Thank you for submitting your data. Unfortunately, your file did not
+      pass validation. Please review the errors below, correct your file,
+      and reply with the updated attachment.
+
+      Validation errors:
+      --------------------------------------------------
+      {errors}
+      --------------------------------------------------
+
+      Please do not hesitate to reach out if you need help interpreting
+      these errors.
+
+      Regards,
+      Admin Team

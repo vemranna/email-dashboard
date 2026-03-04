@@ -1,0 +1,19 @@
+# requirements.txt — Python dependencies for the data-collection system.
+#
+# Install with:
+#   pip install -r requirements.txt --break-system-packages
+#
+# Or in a virtualenv (recommended on Debian Bookworm to avoid apt conflicts):
+#   python3 -m venv venv
+#   source venv/bin/activate
+#   pip install -r requirements.txt
+#
+# All packages below are available in the standard PyPI mirror.
+# On an airgapped machine, use pip with --index-url pointed at your
+# internal PyPI mirror (e.g. devpi or a simple HTTP server with the wheels).
+
+flask>=3.0,<4.0         # Admin dashboard web framework
+pyyaml>=6.0             # config.yaml parsing
+
+# Note: sqlite3, poplib, smtplib, email, subprocess are all part of the
+# Python standard library and do not need to be installed separately.

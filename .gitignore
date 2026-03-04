@@ -1,0 +1,19 @@
+# Ignore Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore backup files (e.g., [somefile].py.orig, [otherfile]-old.py)
+*.orig
+*-old.py
+
+# Ignore config files that contain sensitive data (you can customize this as needed)
+config.yaml
+
+# Ignore data folder if it's generated and not needed for versioning
+data/
+
+# Ignore input files
+recipients.txt
+users.txt
+template.xlsx
