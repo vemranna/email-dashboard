@@ -33,7 +33,7 @@ from config_loader import load_config, set_autosend, is_autosend
 from db import (
     init_db, get_all_recipients, get_all_submissions,
     get_pending_queue, approve_email, approve_all_pending,
-    mark_sent, get_queue_item, get_submissions_for,
+    mark_sent, mark_initial_sent, get_queue_item, get_submissions_for,
 )
 from mailer import send_email
 from auth import require_auth
